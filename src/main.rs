@@ -3,19 +3,23 @@ mod matmul;
 use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
-use std::process::exit;
 use matmul::dot;
 
 fn main() {
+    println!("Hi");
+    variable_test();
+    intro();
     let a = [1.0,3.0,4.0];
     let b = [3.0,4.0,5.0];
-    println!("result: {}", dot(&a, &b))
+    println!("result: {}", dot(&a, &b));
+
+    println!("\n----------------------------------------\n")
 }
 
 fn intro() {
     println!("Guess the number!");
 
-    let secret_number = rand::thread_rng().gen_range(1..=100);
+    let secret_number = rand::thread_rng().gen_range(1..=1);
 
     loop {
         println!("Please input your guess.");
@@ -49,7 +53,7 @@ fn variable_test() {
     let sum = 5 + 10;
 
     // subtraction
-    let difference : i32 = 8 / 3;
+    let quotient1 : i32 = 8 / 3;
 
     // multiplication
     let product = 4 * 30;
@@ -60,5 +64,6 @@ fn variable_test() {
 
     // remainder
     let remainder = 43 % 5;
-    println!("{}", difference)
+    println!("sum: {}, quotient1: {}, product: {}, quotient2: {} truncated: {}, remainder: {}",
+             sum, quotient1, product, quotient, truncated, remainder)
 }
