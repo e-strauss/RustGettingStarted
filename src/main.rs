@@ -24,6 +24,103 @@ fn main() {
     println!("{}", high_and_low("1 2 3 4 5"));
     println!("{}", high_and_low2("1 2 3 4 5"));
     slices_test();
+    println!("\n----------------------------------------\n");
+
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(&rect1)
+    );
+
+    println!("rect1 is {:#?}", rect1);
+
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+
+    let test_str = "Rust";
+
+    // Call the reverse_string function
+    let reversed = reverse_string(test_str);
+
+    // Print the result
+    println!("Original: {}", test_str);
+    println!("Reversed: {}", reversed);
+
+    dotest("AAAA","TTTT");
+    dotest("ATTGC","TAACG");
+    dotest("GTAT","CATA");
+
+    let home = IpAddr::V4(127, 0, 0, 1);
+    let loopback = IpAddr::V6(String::from("::1"));
+    println!("{home:?} \n{loopback:?}");
+    if let IpAddr::V6(ip) = loopback{
+        println!("IPv6 loopback found: {}", ip);
+    }
+    if let IpAddr::V4(a,b,c,d) = home {
+        println!("IPv4 loopback found: {}.{}.{}.{}", a, b, c, d);
+    }
+}
+
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+#[derive(Debug)]
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+
+fn area(rectangle: &Rectangle) -> u32 {
+    rectangle.width * rectangle.height
+}
+
+fn reverse_string(s: &str) -> String {
+    let mut reversed = String::new();
+    for c in s.chars().rev() {
+        reversed.push(c);
+    }
+    reversed
+}
+
+fn dna_strand(dna: &str) -> String {
+    let mut out: String = String::new();
+    for c in dna.chars() {
+        out.push(match c {
+            'A' => 'T',
+            'T' => 'A',
+            'C' => 'G',
+            'G' => 'C',
+            s => s
+        });
+    }
+    out
+}
+
+fn dotest(s: &str, expected: &str) {
+    let actual = dna_strand(s);
+    assert_eq!(actual, expected, "With dna = \"{s}\"\nExpected \"{expected}\" but got \"{actual}\"")
 }
 
 fn first_word(s: &String) -> &str {
