@@ -71,6 +71,30 @@ fn main() {
     if let IpAddr::V4(a,b,c,d) = home {
         println!("IPv4 loopback found: {}.{}.{}.{}", a, b, c, d);
     }
+
+    assert_eq!(sum_two_smallest_numbers(&[5, 8, 12, 19, 22]),  13, "Incorrect result for [5, 8, 12, 19, 22]");
+    assert_eq!(sum_two_smallest_numbers(&[15, 28, 4, 2, 43]), 6, "Incorrect result for [15, 28, 4, 2, 43]");
+    assert_eq!(sum_two_smallest_numbers(&[23, 71, 33, 82, 1]), 24, "Incorrect result for [23, 71, 33, 82, 1]");
+    assert_eq!(sum_two_smallest_numbers(&[52, 76, 14, 12, 4]), 16, "Incorrect result for [52, 76, 14, 12, 4]");
+    assert_eq!(sum_two_smallest_numbers(&[1, 1, 5, 5]),  2, "Incorrect result for [1, 1, 5, 5]");
+
+    assert_eq!(find_even_index(&[1, 2, 3, 4, 3, 2, 1]), Some(3));
+    assert_eq!(find_even_index(&[1, 100, 50, -51, 1, 1]), Some(1));
+    assert_eq!(find_even_index(&[1, 2, 3, 4, 5, 6]), None);
+    assert_eq!(find_even_index(&[20, 10, 30, 10, 10, 15, 35]), Some(3));
+
+    assert_eq!(
+        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 1, 9]),
+        Some(5)
+    );
+    assert_eq!(
+        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 9, 5]),
+        Some(1)
+    );
+    assert_eq!(
+        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 1, 7, 8, 9, 5]),
+        Some(6)
+    );
 }
 
 #[derive(Debug)]
@@ -94,6 +118,35 @@ enum IpAddr {
 
 fn area(rectangle: &Rectangle) -> u32 {
     rectangle.width * rectangle.height
+}
+
+fn sum_two_smallest_numbers(numbers: &[u32]) -> u32 {
+    let mut min1 = u32::MAX;
+    let mut min2 = u32::MAX;
+    for &number in numbers {
+        match (number < min2, number < min1) {
+            (true, true) => {min2 = min1; min1 = number;},
+            (true, false) => min2 = number,
+            _ => {}
+        }
+    }
+    min1 + min2
+}
+
+fn find_even_index(arr: &[i32]) -> Option<usize> {
+    for i in 0..arr.len() {
+        let left: i32 = arr[0..i].iter().sum();
+        let right = arr[(i+1)..].iter().sum();
+        if left == right {
+            return Some(i);
+        }
+    }
+    None
+}
+
+fn find_deleted_number(list: &[u16], mixed_list: &[u16]) -> Option<u16> {
+
+    todo!()
 }
 
 fn reverse_string(s: &str) -> String {
