@@ -2,6 +2,8 @@ mod matmul;
 
 use rand::Rng;
 use std::cmp::Ordering;
+use std::collections::{HashMap, VecDeque};
+use std::hash::Hash;
 use std::io;
 use matmul::dot;
 
@@ -83,18 +85,99 @@ fn main() {
     assert_eq!(find_even_index(&[1, 2, 3, 4, 5, 6]), None);
     assert_eq!(find_even_index(&[20, 10, 30, 10, 10, 15, 35]), Some(3));
 
+    // assert_eq!(
+    //     find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 1, 9]),
+    //     Some(5)
+    // );
+    // assert_eq!(
+    //     find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 9, 5]),
+    //     Some(1)
+    // );
+    // assert_eq!(
+    //     find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 1, 7, 8, 9, 5]),
+    //     Some(6)
+    // );
+
+    let mut cache = LRUCache::new(2);
+
+    cache.put(1, "one");
+    cache.put(2, "two");
+    println!("{:?}", cache.get(1)); // Some("one")
+    cache.put(3, "three");          // Evicts key 2
+    println!("{:?}", cache.get(2)); // None
+    cache.put(4, "four");           // Evicts key 1
+    println!("{:?}", cache.get(1)); // None
+    println!("{:?}", cache.get(3)); // Some("three")
+    println!("{:?}", cache.get(4)); // Some("four")
+
+    assert_eq!(likes(&[]), "no one likes this");
+    assert_eq!(likes(&["Peter"]), "Peter likes this");
+    assert_eq!(likes(&["Jacob", "Alex"]), "Jacob and Alex like this");
     assert_eq!(
-        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 1, 9]),
-        Some(5)
+        likes(&["Max", "John", "Mark"]),
+        "Max, John and Mark like this"
     );
     assert_eq!(
-        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 6, 7, 8, 9, 5]),
-        Some(1)
+        likes(&["Alex", "Jacob", "Mark", "Max"]),
+        "Alex, Jacob and 2 others like this"
     );
-    assert_eq!(
-        find_deleted_number(&[1, 2, 3, 4, 5, 6, 7, 8, 9], &[3, 2, 4, 1, 7, 8, 9, 5]),
-        Some(6)
-    );
+}
+
+fn likes(names: &[&str]) -> String {
+    match names.len() {
+        0 => "no one likes this".to_string(),
+        1 => format!("{} likes this", names[0]),
+        2 => format!("{} and {} like this", names[0], names[1]),
+        3 => format!("{}, {} and {} like this", names[0], names[1], names[2]),
+        l => format!("{}, {} and {} others like this", names[0], names[1], l - 2),
+    }
+}
+
+struct LRUCache<K,V> {
+    map: HashMap<K, V>,
+    queue: VecDeque<K>,
+    capacity: usize,
+}
+
+impl<K, V> LRUCache<K, V>
+where
+    K: Eq + Hash + Clone,
+    V: Clone,
+{
+    fn new(capacity: usize) -> Self {
+        Self {
+            map: HashMap::new(),
+            queue: VecDeque::new(),
+            capacity,
+        }
+    }
+
+    fn get(&mut self, key: K) -> Option<V> {
+        if let Some(value) = self.map.get(&key) {
+            self.queue.retain(|item| item != &key);
+            self.queue.push_back(key.clone());
+            Some(value.clone())
+        } else {
+            None
+        }
+    }
+
+    fn put(&mut self, key: K, value: V) {
+        if self.map.contains_key(&key) {
+            self.map.insert(key.clone(), value);
+            self.queue.retain(|item| item != &key);
+            self.queue.push_back(key);
+        } else {
+            if self.map.len() == self.capacity {
+                if let Some(least_used_key) = self.queue.pop_front() {
+                    self.map.remove(&least_used_key);
+                }
+            }
+            // Insert the new key-value pair
+            self.map.insert(key.clone(), value);
+            self.queue.push_back(key);
+        }
+    }
 }
 
 #[derive(Debug)]
